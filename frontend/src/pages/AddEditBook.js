@@ -16,6 +16,13 @@ export default function AddEditBook() {
   const [image, setImage] = useState(null);
   const navigate = useNavigate();
 
+  // ✅ Redirect to login if not authenticated
+  useEffect(() => {
+    if (!getToken()) {
+      navigate('/login');
+    }
+  }, [navigate]);
+
   // Fetch book data if editing
   useEffect(() => {
     if (id) {

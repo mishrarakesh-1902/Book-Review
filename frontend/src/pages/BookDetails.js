@@ -10,9 +10,20 @@ export default function BookDetails() {
   const [reviewForm, setReviewForm] = useState({ rating: 5, reviewText: '' });
   const navigate = useNavigate();
 
+  // ✅ Redirect to login if not authenticated
+  useEffect(() => {
+    if (!getToken()) {
+      navigate('/login');
+    }
+  }, [navigate]);
+
   const fetch = async () => {
-    const res = await axios.get(`${API_BASE}/books/${id}`);
-    setData(res.data);
+    try {
+      const res = await axios.get(`${API_BASE}/books/${id}`);
+      setData(res.data);
+    } catch (err) {
+      console.error("Error fetching book:", err);
+    }
   };
 
   useEffect(() => { fetch(); }, [id]);
@@ -20,15 +31,24 @@ export default function BookDetails() {
   const submitReview = async (e) => {
     e.preventDefault();
     if (!getToken()) return navigate('/login');
-    await axios.post(`${API_BASE}/reviews/${id}`, reviewForm, { headers: authHeader() });
-    setReviewForm({ rating: 5, reviewText: '' });
-    fetch();
+    try {
+      await axios.post(`${API_BASE}/reviews/${id}`, reviewForm, { headers: authHeader() });
+      setReviewForm({ rating: 5, reviewText: '' });
+      fetch();
+    } catch (err) {
+      console.error("Error submitting review:", err);
+    }
   };
 
   const deleteBook = async () => {
     if (!getToken()) return navigate('/login');
-    await axios.delete(`${API_BASE}/books/${id}`, { headers: authHeader() });
-    navigate('/');
+    if (!window.confirm("Are you sure you want to delete this book?")) return;
+    try {
+      await axios.delete(`${API_BASE}/books/${id}`, { headers: authHeader() });
+      navigate('/');
+    } catch (err) {
+      console.error("Error deleting book:", err);
+    }
   };
 
   return data ? (
@@ -57,7 +77,9 @@ export default function BookDetails() {
           <div className="d-flex justify-content-between align-items-start mb-3">
             <h2 className="fw-bold text-primary">{data.book.title}</h2>
             <div>
-              <Link className="btn btn-outline-secondary me-2" to={`/books/edit/${data.book._id}`}>✏ Edit</Link>
+              <Link className="btn btn-outline-secondary me-2" to={`/books/edit/${data.book._id}`}>
+                ✏ Edit
+              </Link>
               <button className="btn btn-danger" onClick={deleteBook}>🗑 Delete</button>
             </div>
           </div>

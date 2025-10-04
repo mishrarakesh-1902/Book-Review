@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { API_BASE } from '../config';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { getToken } from '../utils';
 
 export default function BookList() {
   const [booksData, setBooksData] = useState({ books: [], page: 1, totalPages: 1 });
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const navigate = useNavigate();
 
   const fetch = async () => {
-    const res = await axios.get(`${API_BASE}/books?page=${page}&search=${encodeURIComponent(search)}`);
-    setBooksData(res.data);
+    try {
+      const res = await axios.get(`${API_BASE}/books?page=${page}&search=${encodeURIComponent(search)}`);
+      setBooksData(res.data);
+    } catch (err) {
+      console.error("Error fetching books:", err);
+    }
   };
 
   useEffect(() => { fetch(); }, [page]);
@@ -21,14 +27,27 @@ export default function BookList() {
     fetch();
   };
 
+  // ✅ Require login before accessing add book or book details
+  const handleProtectedAction = (action) => {
+    if (!getToken()) {
+      navigate('/login');
+    } else {
+      action();
+    }
+  };
+
   return (
     <div className="container py-4">
       {/* Header Section */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="fw-bold text-primary">📚 Book Library</h2>
-        <Link className="btn btn-primary shadow-sm" to="/books/new">
+
+        <button
+          className="btn btn-primary shadow-sm"
+          onClick={() => handleProtectedAction(() => navigate('/books/new'))}
+        >
           ➕ Add New Book
-        </Link>
+        </button>
       </div>
 
       {/* Search */}
@@ -43,16 +62,21 @@ export default function BookList() {
           <button className="btn btn-primary">Search</button>
         </div>
       </form>
-{/* Book Grid */}
+
+      {/* Book Grid */}
       {booksData.books.length === 0 && (
         <p className="text-muted text-center mt-5">No books found. Try adding some!</p>
       )}
       <div className="row g-4">
         {booksData.books.map(b => (
           <div key={b._id} className="col-md-4 col-sm-6">
-            <Link to={`/books/${b._id}`} className="text-decoration-none text-dark">
+            <div
+              className="text-decoration-none text-dark"
+              style={{ cursor: 'pointer' }}
+              onClick={() => handleProtectedAction(() => navigate(`/books/${b._id}`))}
+            >
               <div className="book-card h-100">
-{/* Book Image */}
+                {/* Book Image */}
                 {b.image ? (
                   <div className="book-image-wrapper">
                     <img src={`${API_BASE.replace('/api','')}${b.image}`} alt={b.title} className="book-image" />
@@ -63,7 +87,7 @@ export default function BookList() {
                   </div>
                 )}
 
-{/* Book Info */}
+                {/* Book Info */}
                 <div className="card-body d-flex flex-column">
                   <h5 className="card-title fw-bold text-truncate">{b.title}</h5>
                   <h6 className="text-muted mb-2">by {b.author}</h6>
@@ -73,12 +97,12 @@ export default function BookList() {
                   <small className="text-muted mt-auto">Added by: {b.addedBy?.name}</small>
                 </div>
               </div>
-            </Link>
+            </div>
           </div>
         ))}
       </div>
 
-{/* Pagination */}
+      {/* Pagination */}
       <div className="mt-4 d-flex justify-content-center align-items-center gap-3">
         <button
           className="btn btn-outline-primary"
@@ -99,7 +123,7 @@ export default function BookList() {
         </button>
       </div>
 
-{/* Styling */}
+      {/* Styling */}
       <style>{`
         .book-card {
           background: #fff;
