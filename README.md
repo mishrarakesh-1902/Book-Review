@@ -13,13 +13,17 @@ https://book-review-1-rf3j.onrender.com
 ## 🖼️ Screenshots
 
 ### 🏠 Home Page  
-![Home Page](./screenshots/home.png)
+
+<img width="1919" height="970" alt="image" src="https://github.com/user-attachments/assets/5758c97d-fafd-4687-b171-6adc6a7a3e39" />
+
 
 ### 📖 Book Details  
-![Book Details](./screenshots/book-details.png)
+<img width="1919" height="968" alt="image" src="https://github.com/user-attachments/assets/7fa9481b-ff6d-43d6-80f7-8ace5097ee33" />
+
 
 ### ➕ Add Book  
-![Add Book](./screenshots/add-book.png)
+<img width="1919" height="969" alt="image" src="https://github.com/user-attachments/assets/79a73ef5-ff1d-4eef-b483-45a2fe342569" />
+
 
 ---
 
