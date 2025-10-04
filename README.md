@@ -53,7 +53,7 @@ https://book-review-1-rf3j.onrender.com
 ---
 
 ## 📂 Folder Structure
-
+```
 book-review-platform/
 │
 ├── backend/
@@ -86,7 +86,7 @@ book-review-platform/
 │
 └── README.md
 
-
+```
 ---
 
 ## ⚙️ Installation & Setup
